@@ -1,0 +1,139 @@
+﻿@model List<Flower>
+
+<h1>Flower List</h1>
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <div class="alert alert-success">@ViewBag.Message</div>
+}
+
+<!-- Rest of the view content -->
+
+
+<div class="row">
+    <div class="col-md-8">
+        @if (Model != null && Model.Any())
+        {
+            <ul>
+                @foreach (var flower in Model)
+                {
+                    <li>
+                        <div class="flower-container">
+                            <img decoding="async" src="@("~/images/" + flower.ImgLink)" asp-append-version="true" width="250px" height="250px" />
+                            <div class="flower-details">
+                                <div class="flower-info">
+                                    <strong>Name:</strong> @flower.Name <br />
+                                    <strong>Price:</strong> @flower.Price
+                                </div>
+                                <div class="flower-actions">
+                                    <button onclick="changeQuantity('@flower.Id', -1)">-</button>
+                                    <span id="quantity-@flower.Id">1</span>
+                                    <button onclick="changeQuantity('@flower.Id', 1)">+</button>
+                                    <a asp-controller="Cart" asp-action="Remove" asp-route-id="@flower.Id">
+                                        Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No flowers in the cart.</p>
+        }
+    </div>
+    <div class="col-md-4">
+        <div class="cart-summary">
+            <h2>Cart Summary</h2>
+            <p>Total Cost: <span id="totalCost"></span></p>
+            <button class="btn btn-primary" onclick="checkout()">Checkout</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("totalCost").textContent = CalculateTotalCost();
+    function CalculateTotalCost() {
+        var totalCost = 0;
+    @foreach (var flower in Model)
+    {
+        <text>
+                    var quantityElement = document.getElementById('quantity-' + @flower.Id);
+                var quantity = parseInt(quantityElement.textContent);
+                var flowerPrice = parseFloat('@flower.Price');
+                totalCost += (flowerPrice * quantity);
+        </text>
+    }
+        return totalCost.toFixed(2);
+    }
+
+    function changeQuantity(flowerId, quantityChange) {
+        var quantityElement = document.getElementById('quantity-' + flowerId);
+        var quantity = parseInt(quantityElement.textContent);
+        quantity += quantityChange;
+        if (quantity >= 1) {
+            quantityElement.textContent = quantity;
+        }
+
+        // Recalculate and update the total cost
+        document.getElementById("totalCost").textContent = CalculateTotalCost();
+    }
+
+
+    //function changeQuantity(flowerId, quantityChange) {
+    //    var quantityElement = document.getElementById('quantity-' + flowerId);
+    //    var quantity = parseInt(quantityElement.textContent);
+    //    quantity += quantityChange;
+    //    if (quantity >= 1) {
+    //        quantityElement.textContent = quantity;
+    //    }
+    //}
+
+    function removeFlower(flowerId) {
+        // Perform AJAX request or form submission to remove the flower from the session
+        // and update the view accordingly
+    }
+
+    function checkout() {
+        // Perform checkout logic
+    }
+</script>
+
+<style>
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+
+    .col-md-8,
+    .col-md-4 {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .flower-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .flower-details {
+        margin-left: 20px;
+    }
+
+    .flower-info {
+        margin-bottom: 10px;
+    }
+
+    .flower-actions button {
+        margin-right: 5px;
+    }
+
+    .cart-summary {
+        background-color: #f8f9fa;
+        padding: 15px;
+    }
+</style>
